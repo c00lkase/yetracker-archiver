@@ -54,8 +54,8 @@ def downloadEra(eraName, section):
     if eraName in eraNames:
         sectionName = os.path.splitext(os.path.basename(section))[0]
         folderName = f'{eraName}_{sectionName}'.replace(':', '-')
-        if not os.path.isdir(folderName):
-            os.mkdir(folderName)
+        folderDir = f'./downloads/{folderName}'
+        os.makedirs(folderDir, exist_ok=True)
 
         songs = []
         lastEraLine = -1
@@ -72,7 +72,7 @@ def downloadEra(eraName, section):
                         for song in songs:
                             for link in song:
                                 if str(link).startswith('https://pillows.su/f/'):
-                                    fn = downloadRegular(link, folderName)
+                                    fn = downloadRegular(link, folderDir)
                     songs = []
                 lastEraLine = i
             elif type == 'song':
