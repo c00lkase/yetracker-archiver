@@ -60,9 +60,9 @@ def packageEventLine(line: str):
 
 def getLine(num: int, tsvFile: str):
     line = ''
-    with open(tsvFile, 'r') as f:
+    with open(tsvFile, 'r', encoding="utf8") as f:
         line = f.readlines()[num - 1]
-    
+
     type = detectLineType(line)
     final = None
     if type == 'song':
