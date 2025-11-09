@@ -1,5 +1,25 @@
 import re
+import requests
 from data import eras, eraNames
+
+tsvGID = {
+    'Unreleased': 199908479,
+    'Released': 1295931150,
+    'Stems': 495336364,
+    'Album Copies': 1297512832,
+    'Miscellaneous': 70063278
+}
+
+def createTSVfromGID(gid: int):
+    print('[createTSVfromGID] fetching latest tracker version...')
+    url = f'https://docs.google.com/spreadsheets/d/1oGgQrlUxxoGNAiKa_98vhjxR96pxJ3OdvVHKqpvb29w/export?format=tsv&id=1oGgQrlUxxoGNAiKa_98vhjxR96pxJ3OdvVHKqpvb29w&gid={gid}'
+    response = requests.get(url)
+
+    if response.ok:
+        return response.content.decode('utf-8').splitlines()
+    else:
+        print('[createTSVfromGID] failed to fetch tracker content. exiting...')
+        exit()
 
 def detectLineType(line: str):
     split = line.split('\t')
@@ -58,10 +78,8 @@ def packageEventLine(line: str):
         'Description': desc,
     }
 
-def getLine(num: int, tsvFile: str):
-    line = ''
-    with open(tsvFile, 'r', encoding="utf8") as f:
-        line = f.readlines()[num - 1]
+def getLine(num: int, tsv: list):
+    line = tsv[num - 1]
 
     type = detectLineType(line)
     final = None
