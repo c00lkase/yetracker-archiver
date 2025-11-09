@@ -59,7 +59,7 @@ def downloadEra(eraName, section):
 
         songs = []
         lastEraLine = -1
-        for i in range(1, sum(1 for _ in open(section))):
+        for i in range(1, sum(1 for _ in open(section, encoding="utf8"))):
             data, type = tsv.getLine(i, section)
             
             if type == 'era':
