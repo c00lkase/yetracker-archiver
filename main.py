@@ -52,39 +52,38 @@ def downloadRegular(url: str, folder: str):
 
 def downloadEra(eraName, section):
     if eraName in eraNames:
-        sectionName = os.path.splitext(os.path.basename(section))[0]
-        folderName = f'{eraName}_{sectionName}'
-        if not os.path.isdir(folderName):
-            os.mkdir(folderName)
+        folderName = f'{eraName}_{section}'.replace(':', '-')
+        folderDir = f'./downloads/{folderName}'
+        currTSV = tsv.createTSVfromGID(tsv.tsvGID[section])
+        os.makedirs(folderDir, exist_ok=True)
 
         songs = []
         lastEraLine = -1
-        for i in range(1, sum(1 for _ in open(section))):
-            data, type = tsv.getLine(i, section)
+        for i in range(1, len(currTSV)):
+            data, type = tsv.getLine(i, currTSV)
             
             if type == 'era':
-                print(f'New era: {data['Era']}')
+                print(f'New era: {data["Era"]}')
                 if lastEraLine > -1:
-                    lastEra, _ = tsv.getLine(lastEraLine, section)
+                    lastEra, _ = tsv.getLine(lastEraLine, currTSV)
                     
                     if lastEra['Era'] == eraName:
-                        print(f'Downloading era: {lastEra['Era']}')
+                        print(f'Downloading era: {lastEra["Era"]}')
                         for song in songs:
                             for link in song:
                                 if str(link).startswith('https://pillows.su/f/'):
-                                    fn = downloadRegular(link, folderName)
+                                    fn = downloadRegular(link, folderDir)
                     songs = []
                 lastEraLine = i
             elif type == 'song':
-                print(f'Indexed entry: {data['Name']}')
+                print(f'Indexed entry: {data["Name"]}')
                 if 'Links' in data.keys():
                     songs.append(data['Links'])
     else:
         print('invalid era given')
-                
 
 if __name__ == '__main__':
     era, _ = pick.pick(eraNames, 'Select an era to archive:')
-    file, _ = pick.pick(glob.glob("tracker-tabs/*.tsv"), 'Pick a section:')
+    file, _ = pick.pick(['Unreleased', 'Released', 'Stems', 'Album Copies', 'Miscellaneous'], 'Pick a section:')
     downloadEra(era, file)
     print('[main] Finished!')
